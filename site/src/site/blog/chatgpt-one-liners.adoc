@@ -1,0 +1,444 @@
+= ChatGPT meets Groovy one-liners
+Paul King
+:revdate: 2023-10-19T18:00:00+00:00
+:keywords: groovy, chatgpt, one-liners
+:description: I asked ChatGPT if it could represent some short/one-liner programming-related dad jokes as short/one-liner Groovy scripts.
+
+I asked ChatGPT if it could represent some short/one-liner programming-related dad
+jokes as short/one-liner Groovy scripts. It's responses were initially a little
+underwhelming but after some coercing and some "post-production tweaking", this blog post contains the result. Be forewarned, that the quality of the puns
+is mixed.
+
+But before starting, Groovy makes an excellent language for interacting
+with cloud-based Generative AI systems. You can check out the
+following https://github.com/paulk-asert/demo[GitHub repo] that
+shows how to talk to ChatGPT using Groovy and https://micronaut.io/[Micronaut].
+This example is in turn based on https://www.kousenit.com/[Ken Kousen]'s similar example in Java.
+Check out his excellent https://www.youtube.com/watch?v=cEl3He6Tsmk[video on the topic]. Also check out https://glaforge.dev/[Guillaume Laforge]'s recent posts
+about using Groovy to talk to Google's https://bard.google.com/[Bard] via
+its https://glaforge.dev/posts/2023/05/30/getting-started-with-the-palm-api-in-the-java-ecosystem/[PaLM 2 API] and using
+https://glaforge.dev/posts/2023/09/25/discovering-langchain4j/[LangChain4J].
+
+Having said that, we just used the Web UI for this blog post.
+Now, let's have a look at some of those PUNch lines...
+
+'''
+
+[quote]
+****
+_Q: Why do programmers always mix up Christmas_ 🎄 _and Halloween_ 🎃 _?_
+
+_A: Because 25 Dec(imal) is the same as 31 Oct(al)._
+****
+
+We can check that with the following Groovy script:
+
+[source,groovy]
+----
+def christmas = 25 // dec
+def halloween = 031 // oct
+assert christmas == halloween
+----
+
+'''
+
+[quote]
+****
+_Q: Why is Groovy such a neat language?_
+
+_A: Because it takes a bit from Go,
+supports data science like R though with low ceremony,
+mixes in a dose of Python and Perl, takes a decent chunk of Java
+with a twist of C#, and finishes with some Ruby._
+****
+
+We can check that with the following Groovy script:
+
+[source,groovy]
+----
+assert 'Groovy' == 'Go'.take(1) + 'R'.toLowerCase() +
+                   'Python'['Perl'.size()] * 2 +
+                   'Java'['C#'.size()] + 'Ruby'[-1]
+----
+
+'''
+
+[quote]
+****
+_Q: Why did the developer go broke?_
+
+_A: Because his money cache, intellisense and null stocks were all empty_ 💰.
+****
+
+We combine the `Expando` class with the Elvis operator and Groovy truth to check this fact:
+
+[source,groovy]
+----
+def money = intelli = new Expando()
+def rich = money.cache ?: intelli.cents ?: null?.stocks
+assert !rich
+----
+
+'''
+
+[quote]
+****
+_Q: Why did the programmer think using Groovy was sweet?_
+
+_A: Because creating a box of a-sorted chocolates was easy._
+****
+
+We create a "sortable" `Chocolate` record making use of default parameters and declarative augmentation. Then we create a `Box` class which delegates to `List`. We then create a box of chocolates and check it is "a-sorted" using the `toString()` method:
+
+[source,groovy]
+----
+@Sortable @ToString(ignoreNulls = true)
+record Chocolate(int cocoa, String filling = null) {}
+
+class Box { @Delegate List<Chocolate> contents }
+
+var box = new Box(contents: [
+    new Chocolate(80),
+    new Chocolate(50, 'Caramel')
+].sort())
+
+assert box.toString() == '[Chocolate(50, Caramel), Chocolate(80)]'
+----
+
+'''
+
+[quote]
+****
+_If life gives you melons, ..._
+
+_...you may be dyslexic._ 🍈🍋
+****
+
+Let's take the word 'melons' and jumble it around a bit using Groovy's flexible indexing to see if we get 'lemons':
+
+[source,groovy]
+----
+def dyslexic = 'melons'[2..0,3..-1] == 'lemons'
+assert dyslexic
+----
+
+'''
+
+[quote]
+****
+_6:30 is the best time on a clock, hands down._ 🕡
+****
+
+Let's create a `LocalTime` of 6:30 and check that the hands are pointing down. The minute hand travels 360 degrees in 60 minutes,
+so 6 degrees per minute. We can check at 6:30 that it is pointing straight down (180°).
+The hour hand travels 360° in 720 minutes (1/2 a day), so we divide the total minutes by 2. The total minutes is 60 times the number of hours plus the minutes for the current hour.
+At 6:30, we know the hour hand will have travelled halfway between the 6 and 7 hour markers (15°) but for our test we'll
+just make sure it is point down (we'll say within 20° of straight down which we'll specify as a range). Here is the result:
+
+[source,groovy]
+----
+def (h, m) = LocalTime.of(6, 30)[HOUR_OF_DAY, MINUTE_OF_HOUR]
+assert 6 * m == 180L
+assert (h * 60 + m).intdiv(2) in 180L..200L
+----
+
+'''
+
+[quote]
+****
+_Q: What's the difference between ignorance and apathy?_
+
+_A: I don’t know and I don’t care._
+****
+
+To show this with Groovy, we should first declare our
+ignorance and apathy. Then we calculate the difference
+and finally check our assertions:
+
+[source,groovy]
+----
+int ignorance, apathy
+int know = care = ignorance - apathy
+assert !know && !care
+----
+
+'''
+
+[quote]
+****
+_Can Groovy help me answer the question: Which came first, the chicken or the egg?_
+****
+
+Sure, run this script:
+
+[source,groovy]
+----
+def (first, second) = ['egg', 'chicken'].shuffled()
+println "Which came first, the $first or the $second? The eternal debate!"
+----
+
+It really just asks the question in two different orders,
+but I'm sure you get the idea.
+
+'''
+
+[quote]
+****
+_Q: Why are death, taxes, and immutability similar?_
+
+_A: Because, in life and programming, they're the only things you can't change!_
+****
+
+Since death and taxes are certain, we should store a quote
+about them in an immutable structure.
+A record offers shallow immutability and works well for this.
+For deep immutability, consider using the `@Immutable` AST transform,
+so here even though our quotes are stored in a mutable ArrayList,
+there is no way to change it.
+Here is an example:
+
+[source,groovy]
+----
+record Quote(String text, String author, int year) { }
+var q1 = new Quote('Perfection is immutable. But for things imperfect, change is the way to perfect them.', 'Owen Feltham', 1840)
+var q2 = new Quote('Nothing is certain except death and taxes.', 'Benjamin Franklin', 1789)
+
+@Immutable
+class FavoriteQuotes { List<Quote> list }
+
+var favorites = new FavoriteQuotes([q1, q2])
+----
+
+'''
+
+[quote]
+****
+_Q: Why are diamonds and dogs a person's best friends?_
+
+_A: Because diamonds are forever, and dogs are fur-ever!_ 💎 🐕
+****
+
+Let's use traits to check best friends for diamonds and dogs:
+
+[source,groovy]
+----
+trait HasBestFriend {
+    abstract String friend()
+    boolean isBestFriend(String candidate) {
+        friend() == candidate
+    }
+}
+
+class Diamond implements HasBestFriend {
+    String friend() { 'girl' }
+}
+
+class Dog implements HasBestFriend {
+    String friend() { 'man' }
+}
+
+assert ['man', 'girl'].collect{
+    [new Diamond().isBestFriend(it),
+     new Dog().isBestFriend(it)]
+} == [[false, true], [true, false]]
+----
+
+'''
+
+[quote]
+****
+_Q: Why did the Land Rover car get along so well with the Land Rover Explore smartphone?_
+
+_A: Because they both knew the importance of "exploring" new territories,
+whether off-road or online!!_
+****
+
+Who knew that Cars and Smartphones had anything to do with each other,
+but the trend seems to be companies want to get involved in both.
+Similarly, if you have two classes that apparently have nothing to
+do with one another, Groovy's duck typing, or in this case
+property handling might allow you to use them together more easily
+than you think.
+
+[source,groovy]
+----
+import groovy.transform.*
+
+record Smartphone(String make, String model, String color, int year) { }
+
+record Car(String make, String model, String color, int year) { }
+
+def s = new Smartphone('Landrover', 'Explore', 'Black', 2018)
+def c = new Car(s.toMap())
+assert c.toString() == 'Car[make=Landrover, model=Explore, color=Black, year=2018]'
+----
+
+'''
+
+[quote]
+****
+_Q: Why did the Jedi use a mind trick on the stormtroopers when they couldn't find the missing droids?_
+
+_A: Because, as Obi-Wan said, "These aren't the droids you're looking for. You're actually looking for your misplaced keys, and you'll find them in the last place you look!"_
+****
+
+Let's first show how Groovy could help us find some droids that we are looking for.
+Drones are hardest to find when there are several clone look-a-likes. We won't mention the clone wars!
+
+We'll create a shuffled list of droids and their clones, and then search for the ones we are after:
+
+[source,groovy]
+----
+@AutoClone class Droid { String name }
+
+def r2d2 = new Droid(name: 'R2-D2')
+def c3po = new Droid(name: 'C-3PO')
+def droids = [r2d2, c3po]
+3.times {
+    droids << r2d2.clone()
+    droids << c3po.clone()
+}
+droids.shuffle()
+droids.eachWithIndex { droid, index ->
+    if (droid == r2d2) println "Droid $index is $r2d2.name"
+    if (droid == c3po) println "Droid $index is $c3po.name"
+}
+----
+
+If we don't want to output the index where we found the droid, we can use
+an alternative expression to show that the droids we are after are found:
+
+[source,groovy]
+----
+assert droids.any{ it.is(r2d2) }
+assert droids.any{ it.is(c3po) }
+----
+
+Of course, Obi-Wan uses a Jedi mind trick which we can show here using
+some Groovy metaprogramming, in this case a category class:
+
+[source,groovy]
+----
+class JediMindTrick {
+    static boolean is(Droid d, Droid other) { false }
+}
+
+use(JediMindTrick) {
+    assert !droids.any{ it.is(r2d2) }
+    assert !droids.any{ it.is(c3po) }
+}
+----
+
+'''
+[quote]
+****
+_Q: What happened when the pirates pet bird tried to say "Pieces of 7"?_
+
+_A: It got a ParrotyError!"_ 🦜
+****
+
+As shown here:
+
+[source,groovy]
+----
+try {
+    pet.say('Pieces of 7')
+} catch(ParrotyError e) {
+    var plank = e.stackTrace
+    plank.walk()
+}
+----
+
+'''
+[quote]
+****
+_Q: Why did the functions stop calling each other?_
+
+_A: Because they had constant arguments._
+****
+
+By definition, pure functions always return
+the same result for the same inputs.
+As such, a potential optimization for pure functions
+is to cache the result for a given set of input values.
+Groovy provides the `@Memoized` AST transform to do this
+(and a `.memoized()` method call for Closures).
+
+Let's write a `StringUtil` class
+that has an _almost_ pure function. The return value of the `bothCases` method
+is a pure function in terms of its inputs. It returns a list containing
+the lowercase and uppercase values for the input string.
+It also has a side effect of incrementing a counter whenever it is called;
+this is just so we can understand what is going on.
+
+[source,groovy]
+----
+class StringUtil {
+    static int count = 0
+
+    @Memoized
+    static List<String> bothCases(String s) {
+        count++
+        [s.toLowerCase(), s.toUpperCase()]
+    }
+}
+----
+
+We apply the `@Memoized` annotation to `bothCases` which enables the automatic
+caching. The annotation has a number of optional annotation attributes for
+configuring the caching behavior, but we'll just use the defaults.
+
+We can see that for constant arguments, 'Foo' called twice in our case,
+that there is no need to invoke the `bothCases` method on the second call,
+since we can use the cached value from the previous call.
+
+[source,groovy]
+----
+assert StringUtil.count == 0
+assert StringUtil.bothCases('Foo') == ['foo', 'FOO']
+assert StringUtil.count == 1
+assert StringUtil.bothCases('Foo') == ['foo', 'FOO']
+assert StringUtil.count == 1
+----
+
+'''
+
+[quote]
+****
+_Binary: it's easy as 1, 10, 11_
+****
+
+[source,groovy]
+----
+println "Binary: It's as easy as ${(1..3).collect{ Integer.toBinaryString(it) }.join(', ')}"
+----
+
+'''
+
+[quote]
+****
+_Q: On my first day of work at the sheep farm, I was asked to roundup 37 sheep?_
+
+_A: I said 40!_ 🐑 🐏
+****
+
+[source,groovy]
+----
+assert 40 == Math.round(37/10)*10
+----
+
+'''
+
+[quote]
+****
+_Q: What code did the programmer write to celebrate Groovy's 20th birthday?_ 🎂
+
+_A: A hip-hip array_
+****
+
+[source,groovy]
+----
+String[] celebrate = ['hip', 'hip']
+----
+
+'''

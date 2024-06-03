@@ -1,0 +1,31 @@
+= Groundhog Day
+Paul King
+:revdate: 2023-02-02T00:00:00+00:00
+:keywords: groovy, datetime, timecategory, date
+:description: Inspired by a recent tweet, this blog looks at some datetime manipulations to calculate the period between Groundhog day and the start of Spring.
+
+https://twitter.com/kenkousen[Ken Kousen] posted a
+https://twitter.com/kenkousen/status/1621272529481367554[tweet]
+in honor of https://en.wikipedia.org/wiki/Groundhog_Day[Groundhog Day]
+looking at the kotlinx-datetime library.
+
+image:img/Groundhog.png[Groundhog]
+
+The North American tradition, or superstition, depending on how you view such things,
+is that if the Groundhog emerges from its burrow and sees its shadow, Winter
+will continue for 6 weeks, but otherwise Spring will come early.
+
+Looking at the dates for 2023 (it differs slightly each year) we can see that
+Spring isn't due for 6 weeks and 4 days, so if Spring starts in 6 weeks,
+it is early anyway! While it certainly falls into the category of
+nerds having fun, it's a good simple example of using date library functionality.
+
+This blog looks at a similar Groovy solution:
+
+[source,groovy]
+----
+var groundHogDay = LocalDate.of(2023, FEBRUARY, 2)
+var springEquinoxNorthernHemisphere = LocalDate.of(2023, MARCH, 20)
+var expectedDays = use(TimeCategory) { 6.weeks + 4.days }.days
+assert springEquinoxNorthernHemisphere - groundHogDay == expectedDays
+----

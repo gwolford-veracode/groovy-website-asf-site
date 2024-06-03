@@ -1,0 +1,6 @@
+script: ./gradlew -q -s generate
+dist: trusty
+jdk:
+- openjdk11
+
+
